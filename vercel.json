@@ -15,6 +15,15 @@
       "destination": "/signup.html"
     },
     {
+      "source": "/auth/login",
+      "destination": "/login.html"
+     },
+
+    {
+      "source": "/auth/signup",
+      "destination": "/signup.html"
+     },
+    {
       "source": "/dashboard",
       "destination": "/dashboard.html"
     },
