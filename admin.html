@@ -1,0 +1,101 @@
+<!DOCTYPE html><html><head><title>Admin</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<div class="main" style="margin-left:0">
+  <div class="top"><h1>Admin Panel</h1><a class="btn red" href="/auth/logout">Logout</a></div>
+  <section class="card"><h2>Products</h2><div id="products"></div></section>
+  <section class="card"><h2>Bookings / QR Verification / Invoice</h2><div id="bookings"></div></section>
+</div>
+<script src="/socket.io/socket.io.js"></script><script src="/js/common.js"></script>
+<script>
+function lp(){
+ fetch('/admin-api/products', {cache:'no-store'}).then(r=>r.json()).then(data=>{
+  const pending = data.filter(p => !p.status || p.status === 'Vendor Review Pending' || p.status === 'Pending');
+  products.innerHTML = pending.length ? pending.map(p=>`
+    <div class="product-card admin-product-card" id="product-${p._id}">
+      <h3>${p.product} by ${p.farmerName}</h3>
+      ${p.imagePath?`<img class="product-img" src="${p.imagePath}">`:''}
+      <p><b>District:</b> ${p.district}, ${p.state || ''}</p>
+      <p><b>Quantity:</b> ${p.quantity || '-'} kg</p>
+      <p><b>Expected Price:</b> ₹${p.expectedPrice || '-'}/kg | <b>Selling Price:</b> ₹${p.sellingPrice || '-'}/kg</p>
+      <p><b>Selling Place:</b> ${p.sellingPlace || '-'}</p>
+      <p><b>Description:</b> ${p.description || '-'}</p>
+      <p><b>AI Score:</b> ${p.qualityScore || 0}% | <b>${p.qualityLabel || 'Manual Review'}</b></p>
+      <p><b>Status:</b> <span class="badge">${p.status || 'Vendor Review Pending'}</span></p>
+      <form method="POST" action="/admin-api/products/${p._id}/status" class="verify-form" onsubmit="setTimeout(()=>{ const el=document.getElementById('product-${p._id}'); if(el) el.remove(); },100)">
+        <label>Admin Decision</label>
+        <select name="status" required>
+          <option value="Approved">Approve Product</option>
+          <option value="Rejected">Reject Product</option>
+        </select>
+        <input class="input" name="vendorNote" placeholder="Admin note for farmer">
+        <button class="btn">Save Decision</button>
+      </form>
+    </div>
+  `).join('') : '<p>No pending products for verification. Approved/Rejected products MongoDB me saved hain aur pending list se remove ho chuke hain.</p>';
+ });
+}
+function lb(){
+ fetch('/admin-api/bookings').then(r=>r.json()).then(data=>{
+  bookings.innerHTML=data.map(b=>`
+    <div class="booking-card">
+      <h3>${b.product} by ${b.farmerName}</h3>
+      <p><b>Buyer:</b> ${b.buyerName || '-'}</p>
+      <p><b>Place:</b> ${b.place || '-'}</p>
+      <p><b>Payment:</b> ${b.paymentStatus || 'Pending'} | <b>Final Price:</b> ₹${b.finalPrice || 0}</p>
+      <p><b>QR Verified:</b> ${b.qrVerified ? 'Yes' : 'No'}</p>
+      ${stepsHtml(b.liveStep)}
+      ${b.qrCodeDataUrl ? `<div class="qr-box"><img src="${b.qrCodeDataUrl}"><p>Booking QR</p></div>` : ''}
+      <form method="POST" action="/admin-api/bookings/${b._id}/verify">
+        <div class="row">
+          <div><label>Status</label><select name="status"><option>Approved</option><option>Pending</option><option>Completed</option><option>Rejected</option></select></div>
+          <div><label>Live Step</label><select name="liveStep"><option>Vendor Reviewing</option><option>Approved</option><option>Farmer On The Way</option><option>Reached Mandi</option><option>Sale Completed</option></select></div>
+        </div>
+        <div class="row">
+          <div><label>Assigned Date</label><input class="input" name="assignedDate" type="date"></div>
+          <div><label>Assigned Time</label><input class="input" name="assignedTime" placeholder="10:00 AM - 11:00 AM"></div>
+        </div>
+        <div class="row">
+          <div><label>Final Price</label><input class="input" name="finalPrice" type="number" placeholder="Example: 10000"></div>
+          <div><label>Payment Status</label><select name="paymentStatus"><option>Pending</option><option>Paid</option><option>Partially Paid</option></select></div>
+        </div>
+        <input class="input" name="vendorNote" placeholder="Vendor note">
+        <button class="btn">Verify / Update Slot</button>
+      </form>
+      <div class="action-row">
+        <form method="POST" action="/api/bookings/${b._id}/qr-verify"><button class="btn">Mark QR Verified</button></form>
+        <a class="btn white" href="/api/bookings/${b._id}/invoice">Download Invoice PDF</a>
+      </div>
+    </div>`).join('')
+ })
+}
+const s=io();s.emit('join:admin');s.on('admin:booking:update',lb);s.on('admin:products:update',lp);lp();lb();
+</script><section class="card"><h2>Daily Equipment Requirements</h2><div id="equipmentBookings">Loading...</div></section>
+<script>
+function loadEquipmentBookings(){
+ fetch('/admin-api/equipment-bookings', {cache:'no-store'}).then(r=>r.json()).then(data=>{
+  const box = document.getElementById('equipmentBookings');
+  if(!box) return;
+  box.innerHTML = data.length ? data.map(b=>`
+    <div class="booking-card">
+      <h3>${b.equipmentName} by ${b.farmerName}</h3>
+      <p><b>District:</b> ${b.district}, ${b.state}</p>
+      <p><b>Date:</b> ${b.bookingDate} · ${b.timeSlot}</p>
+      <p><b>Location:</b> ${b.pickupLocation}</p>
+      <p><b>Purpose:</b> ${b.purpose || '-'}</p>
+      <p><b>Amount:</b> ₹${b.paymentAmount || b.rentPrice}</p>
+      <p><b>Payment:</b> <span class="badge">${b.paymentStatus || 'Pending'}</span></p>
+      <form method="POST" action="/admin-api/equipment-bookings/${b._id}/status">
+        <div class="row">
+          <div><label>Status</label><select name="status"><option>Approved</option><option>Pending</option><option>Completed</option><option>Rejected</option></select></div>
+          <div><label>Live Step</label><select name="liveStep"><option>Submitted</option><option>Payment Done</option><option>Approved</option><option>On The Way</option><option>Equipment Delivered</option><option>Completed</option></select></div>
+        </div>
+        <input class="input" name="vendorNote" placeholder="Admin note / driver details">
+        <button class="btn">Update Requirement</button>
+      </form>
+    </div>
+  `).join('') : '<p>No equipment requirements yet.</p>';
+ });
+}
+loadEquipmentBookings();
+setInterval(loadEquipmentBookings, 8000);
+</script>
+</body></html>

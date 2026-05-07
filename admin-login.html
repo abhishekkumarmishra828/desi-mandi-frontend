@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login - Desi Mandi</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <div class="auth-bg-slider">
+    <img id="authBgImage" src="/assets/login/login-crop.jpeg" alt="Admin farming background">
+    <div class="auth-overlay"></div>
+  </div>
+
+  <main class="auth-layout">
+    <section class="auth-info">
+      <div class="brand-pill">🌿 Desi Mandi Admin</div>
+      <h1>Admin Panel Access</h1>
+      <p>Product verification, farmer slot approval, equipment requirements aur mandi marketplace management ke liye secure login.</p>
+      <div class="auth-points">
+        <span>✅ Product approval / rejection</span>
+        <span>📦 Slot and booking verification</span>
+        <span>🚜 Equipment requirement tracking</span>
+        <span>🔐 Captcha protected access</span>
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <h1>Admin Login</h1>
+      <p class="muted center">Default: admin@dvm.com / Admin@123</p>
+
+      <form method="POST" action="/auth/admin-login" id="adminLoginForm">
+        <label>Email</label>
+        <input class="input" name="email" type="email" value="admin@dvm.com" required>
+
+        <label>Password</label>
+        <input class="input" name="password" type="password" value="Admin@123" required>
+
+        <label>Security Captcha</label>
+        <div class="captcha-row">
+          <div class="captcha-box">
+            <span id="captchaText" data-captcha-text>Loading</span>
+          </div>
+          <button id="refreshCaptcha" type="button" class="captcha-refresh">↻</button>
+        </div>
+
+        <input class="input" name="captcha" placeholder="Enter captcha code" autocomplete="off" required>
+
+        <button class="btn full auth-submit" type="submit">Login</button>
+        <p class="auth-link">First time? <a href="/admin-api/setup">Create Admin</a></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="/assets/js/captcha.js"></script>
+  <script>
+    const bgImages = [
+      "/assets/login/login-crop.jpeg",
+      "/assets/login/login-wheat.jpeg",
+      "/assets/login/login-farm-1.jpeg",
+      "/assets/login/login-farm-2.jpeg"
+    ];
+    let bgIndex = 0;
+    const bg = document.getElementById("authBgImage");
+    bgImages.forEach(src => { const i = new Image(); i.src = src; });
+    setInterval(() => {
+      bgIndex = (bgIndex + 1) % bgImages.length;
+      bg.classList.add("fade-out");
+      setTimeout(() => {
+        bg.src = bgImages[bgIndex] + "?v=admin";
+        bg.classList.remove("fade-out");
+      }, 420);
+    }, 2500);
+  </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head><title>My Equipment Bookings</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<script src="/js/common.js"></script><script src="/js/i18n.js"></script>
+<script>document.write(nav('eqbookings'))</script>
+<main class="main">
+  <div class="top"><h1 data-user></h1><a class="btn" href="/equipment">Book Equipment</a></div>
+  <section class="card">
+    <h2>My Tractor / Equipment Bookings</h2>
+    <div id="list"></div>
+  </section>
+</main>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+function load(){
+ fetch('/api/equipment-bookings/mine').then(r=>r.json()).then(data=>{
+  list.innerHTML=data.length?data.map(b=>`
+    <div class="booking-card">
+      <div class="top"><h3>${b.equipmentName}</h3><span class="badge">${b.paymentStatus || 'Pending'}</span></div>
+      <p>${b.equipmentType} · ₹${b.paymentAmount || b.rentPrice} / ${b.rentType}</p>
+      <p><b>Date:</b> ${b.bookingDate} · ${b.timeSlot}</p>
+      <p><b>Location:</b> ${b.pickupLocation}</p>
+      <p><b>Purpose:</b> ${b.purpose||'-'}</p>
+      <p><b>Admin Status:</b> <span class="badge">${b.status}</span></p>
+      ${(b.paymentStatus || '').includes('Paid') ? '' : `<a class="btn" href="/equipment-payment/${b._id}">Pay Now</a>`}
+    </div>
+  `).join(''):'<p>No equipment booking yet.</p>';
+ });
+}
+initHeader().then(me=>{const s=io();s.emit('join:user',me.id);s.on('equipment:update',load);load();});
+applyTranslations();injectFooter();
+</script>
+</body></html>

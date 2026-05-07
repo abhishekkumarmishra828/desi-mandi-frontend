@@ -1,0 +1,98 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/signup.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/choose-language",
+      "destination": "/choose-language.html"
+    },
+    {
+      "source": "/admin-login",
+      "destination": "/admin-login.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/mandi-prices",
+      "destination": "/mandi-prices.html"
+    },
+    {
+      "source": "/sell-product",
+      "destination": "/sell-product.html"
+    },
+    {
+      "source": "/sell-category",
+      "destination": "/sell-category.html"
+    },
+    {
+      "source": "/book-slot",
+      "destination": "/book-slot.html"
+    },
+    {
+      "source": "/restaurant-buyers",
+      "destination": "/restaurant-buyers.html"
+    },
+    {
+      "source": "/equipment",
+      "destination": "/equipment.html"
+    },
+    {
+      "source": "/book-equipment",
+      "destination": "/book-equipment.html"
+    },
+    {
+      "source": "/equipment-payment/:id",
+      "destination": "/equipment-payment.html"
+    },
+    {
+      "source": "/nearby-buyers",
+      "destination": "/nearby-buyers.html"
+    },
+    {
+      "source": "/buyer-map",
+      "destination": "/buyer-map.html"
+    },
+    {
+      "source": "/my-products",
+      "destination": "/my-products.html"
+    },
+    {
+      "source": "/my-bookings",
+      "destination": "/my-bookings.html"
+    },
+    {
+      "source": "/my-equipment-bookings",
+      "destination": "/my-equipment-bookings.html"
+    },
+    {
+      "source": "/categories",
+      "destination": "/categories.html"
+    },
+    {
+      "source": "/payment-success",
+      "destination": "/payment-success.html"
+    },
+    {
+      "source": "/verify-qr/:id",
+      "destination": "/verify-qr.html"
+    }
+  ]
+}

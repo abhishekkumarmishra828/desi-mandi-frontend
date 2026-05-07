@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Choose Language</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="language-page">
+    <div class="language-card">
+      <div class="logo big">🌿 Desi Mandi</div>
+      <h1>Choose Your Language</h1>
+      <p>Apni bhasha choose karein. Website usi language me show hogi.</p>
+
+      <div class="language-grid">
+        <button type="button" class="lang-btn" data-lang="en">
+          <span>🇬🇧</span>
+          <b>English</b>
+          <small>Continue in English</small>
+        </button>
+
+        <button type="button" class="lang-btn" data-lang="hi">
+          <span>🇮🇳</span>
+          <b>हिंदी</b>
+          <small>हिंदी में जारी रखें</small>
+        </button>
+
+        <button type="button" class="lang-btn" data-lang="bho">
+          <span>🌾</span>
+          <b>भोजपुरी</b>
+          <small>भोजपुरी में जारी रखीं</small>
+        </button>
+      </div>
+
+      <form id="langForm" method="POST" action="/set-language" style="display:none">
+        <input type="hidden" name="language" id="languageInput" value="en">
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const lang = btn.dataset.lang || "en";
+        localStorage.setItem("dvmLang", lang);
+        document.getElementById("languageInput").value = lang;
+        document.getElementById("langForm").submit();
+      });
+    });
+  </script>
+</body>
+</html>

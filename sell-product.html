@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><title>Sell Product</title><link rel="stylesheet" href="/css/style.css"></head><body><script src="/js/common.js"></script><script src="/js/i18n.js"></script><script>document.write(nav('sell'))</script><main class="main"><h1>Sell Your Product</h1><p data-user></p><form class="card" method="POST" action="/api/products" enctype="multipart/form-data" style="max-width:760px"><div class="row"><div><label>Product</label><select name="product"><option>Potato</option><option>Tomato</option><option>Onion</option><option>Mango</option><option>Cauliflower</option></select></div><div><label>Quantity</label><input class="input" name="quantity" type="number" value="500" required></div></div><div class="row"><div><label>Expected Price/kg</label><input class="input" name="expectedPrice" type="number" value="20" required></div>
+      <div>
+        <label>Current Selling Price / kg</label>
+        <input class="input" name="sellingPrice" type="number" min="1" placeholder="Example: 25" required>
+        <small class="muted">Expected price must be lower than this selling/current market price.</small>
+      </div>
+<div><label>Selling Place</label><input class="input" name="sellingPlace" required></div></div><label>Product Image for AI Check</label><div class="upload"><input id="imageInput" name="image" type="file" accept="image/*" required><br><br><img id="preview" style="display:none"></div><label>Description</label><textarea name="description" placeholder="Fresh, harvest date, quality"></textarea><br><button class="btn full">Submit Product + AI Check</button></form></main><script>initHeader();imageInput.onchange=()=>{preview.style.display='block';preview.src=URL.createObjectURL(imageInput.files[0])}</script><script>applyTranslations(); injectFooter();</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("form");
+  if(!form) return;
+  form.addEventListener("submit", (e) => {
+    const expected = Number(form.querySelector('[name="expectedPrice"]')?.value || 0);
+    const selling = Number(form.querySelector('[name="sellingPrice"]')?.value || 0);
+    if(!selling || selling <= 0){
+      e.preventDefault();
+      alert("Current Selling Price / kg enter karein. Example: 25");
+      return;
+    }
+    if(!expected || expected <= 0){
+      e.preventDefault();
+      alert("Expected Price / kg enter karein.");
+      return;
+    }
+    if(expected >= selling){
+      e.preventDefault();
+      alert("Expected Price ko Selling Price se kam rakhein. Example: selling price 25 hai to expected price 23 ya usse kam hona chahiye.");
+      return;
+    }
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector('form[action="/api/products"]');
+  if(!form) return;
+  form.addEventListener("submit", (e) => {
+    const expected = Number(form.querySelector('[name="expectedPrice"]')?.value || 0);
+    const selling = Number(form.querySelector('[name="sellingPrice"]')?.value || 0);
+    if(!selling || selling <= 0){
+      e.preventDefault();
+      alert("Current Selling Price/kg enter karein. Example: 25");
+      return;
+    }
+    if(!expected || expected <= 0){
+      e.preventDefault();
+      alert("Expected Price/kg enter karein.");
+      return;
+    }
+    const maxExpected = Math.max(1, selling - 2);
+    if(expected > maxExpected){
+      e.preventDefault();
+      alert(`Expected Price kam rakhein. Selling price ₹${selling}/kg hai, expected price ₹${maxExpected}/kg ya usse kam hona chahiye.`);
+      return;
+    }
+  });
+});
+</script>
+
+</body></html>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650">
+<defs>
+<linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#dff7ff"/><stop offset="1" stop-color="#f6fff1"/></linearGradient>
+<linearGradient id="field" x1="0" x2="1"><stop stop-color="#4caf50"/><stop offset="1" stop-color="#98c93c"/></linearGradient>
+</defs>
+<rect width="1000" height="650" fill="url(#sky)"/>
+<circle cx="860" cy="95" r="55" fill="#ffd35c" opacity=".9"/>
+<rect y="340" width="1000" height="310" fill="url(#field)"/>
+<g opacity=".55" stroke="#2f8e3d" stroke-width="5">
+<path d="M0 410 C180 370 280 460 450 415 C630 365 760 455 1000 390"/>
+<path d="M0 485 C180 445 280 535 450 490 C630 440 760 530 1000 465"/>
+</g>
+<g transform="translate(115 155)">
+<rect x="80" y="245" width="420" height="130" rx="35" fill="#8a5b28"/>
+<path d="M90 275 C170 390 420 390 500 275" stroke="#5b3514" stroke-width="22" fill="none"/>
+<circle cx="150" cy="245" r="48" fill="#e53935"/>
+<circle cx="225" cy="228" r="45" fill="#f57c00"/>
+<circle cx="310" cy="248" r="48" fill="#8bc34a"/>
+<circle cx="395" cy="230" r="43" fill="#ffca28"/>
+<circle cx="470" cy="252" r="45" fill="#d32f2f"/>
+<ellipse cx="300" cy="315" rx="70" ry="40" fill="#7cb342"/>
+</g>
+<g transform="translate(690 275)">
+<path d="M0 250 C40 120 80 80 130 0 C190 85 220 120 260 250Z" fill="#f4c542"/>
+<g stroke="#8a6817" stroke-width="5"><line x1="130" y1="20" x2="130" y2="245"/><line x1="78" y1="110" x2="185" y2="110"/><line x1="48" y1="170" x2="215" y2="170"/></g>
+</g>
+<text x="500" y="85" text-anchor="middle" font-size="50" font-family="Arial" font-weight="900" fill="#063d43">SELL YOUR FARM PRODUCTS</text>
+</svg>

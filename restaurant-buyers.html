@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Restaurant Bulk Buyers</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<script src="/js/common.js"></script>
+<script src="/js/i18n.js"></script>
+<script>document.write(nav('restaurants'))</script>
+
+<main class="main">
+  <div class="top">
+    <h1>Restaurant Bulk Buyer System</h1>
+    <a class="btn white" href="/sell-product">Sell Your Product</a>
+  </div>
+
+  <section class="hero-mini restaurant-hero">
+    <div>
+      <span class="tag">B2B Fresh Supply</span>
+      <h2>Hotels, restaurants aur vendors directly farmers se bulk order kar sakte hain.</h2>
+      <p>Is feature se farmers ko middleman ke bina bulk demand milti hai, aur restaurants ko fresh product reasonable price par milta hai.</p>
+      <a class="btn" href="#buyers">View Restaurant Buyers</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Why Restaurant Buyers?</h2>
+    <div class="feature-grid">
+      <div><h3>🥔 Bulk Order</h3><p>Example: 500kg potato, 2 ton onion, 300kg tomato weekly demand.</p></div>
+      <div><h3>💰 Lower Food Cost</h3><p>Restaurants directly farmers se kharidenge, isliye procurement cost kam hoga.</p></div>
+      <div><h3>🌱 Fresh Supply</h3><p>Farm fresh vegetables aur fruits ka regular supply chain banega.</p></div>
+    </div>
+  </section>
+
+  <section class="card" id="buyers">
+    <div class="top">
+      <h2>District-wise Restaurant Buyers</h2>
+      <div class="mini-filter">
+        <select id="districtSelect"></select>
+        <button class="btn" onclick="loadBuyers()">Search</button>
+      </div>
+    </div>
+    <div class="grid" id="restaurantList"></div>
+  </section>
+
+  <section class="card">
+    <h2>Bulk Order Request</h2>
+    <form class="bulk-form" method="POST" action="/api/products">
+      <div class="row">
+        <div><label>Product</label><input class="input" name="product" placeholder="Potato / Onion / Tomato" required></div>
+        <div><label>Quantity</label><input class="input" name="quantity" placeholder="500 kg / 2 ton" required></div>
+      </div>
+      <div class="row">
+        <div><label>Expected Price / kg</label><input class="input" name="expectedPrice" placeholder="₹20/kg" required></div>
+        <div><label>Selling Place</label><input class="input" name="place" placeholder="Your mandi / village" required></div>
+      </div>
+      <label>Description</label>
+      <textarea name="description" placeholder="Freshness, harvest date, quality details"></textarea>
+      <button class="btn full">Post Product for Restaurant Buyers</button>
+    </form>
+  </section>
+
+  <section class="about-section">
+    <h1>About <span>Desi Mandi</span></h1>
+    <p>Desi Mandi is a direct agriculture marketplace where farmers can sell fresh produce, book tractor transport, compare mandi prices, and connect with verified bulk buyers such as restaurants, hotels, vendors, and local markets.</p>
+    <h3>🌱 Key Features</h3>
+    <ul class="check-list">
+      <li><b>Buy & Sell</b> – Vegetables, fruits, grains, livestock, seeds and farm products.</li>
+      <li><b>Rent Easily</b> – Tractor, pickup, harvester, rotavator, sprayer and farming tools.</li>
+      <li><b>Bulk Restaurant Orders</b> – Hotels and restaurants can source fresh products directly from farmers.</li>
+      <li><b>Local Marketplace</b> – District-wise buyers, mandi rates, and nearby vendors.</li>
+      <li><b>Multi-language Support</b> – Hindi, English and Bhojpuri for easy farmer access.</li>
+    </ul>
+  </section>
+
+  <section class="info-cards">
+    <h1>How to Buy, Sell & Rent Agricultural Products Online</h1>
+    <p>Farmers, buyers and suppliers can trade agricultural products, rent farm equipment, and grow their agri-business without unnecessary middlemen.</p>
+    <div class="three-cards">
+      <div><h2>Buy Agricultural Products</h2><p>Restaurants and bulk buyers can purchase fresh vegetables, fruits, grains, dairy, seeds and organic manure directly from verified farmers.</p></div>
+      <div><h2>Sell Farm Products Online</h2><p>Farmers can upload product details, set price, add images, and receive bulk demand from verified buyers near their district.</p></div>
+      <div><h2>Rent Farming Equipment</h2><p>Need tractor, harvester, pickup, rotavator or sprayer? Farmers can book equipment for transport and field work.</p></div>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <h1>Frequently Asked Questions</h1>
+    <div class="faq-item"><h3>What is Desi Mandi?</h3><p>It is a farmer-first platform for selling produce, checking mandi rates, booking equipment, and connecting with verified buyers.</p></div>
+    <div class="faq-item"><h3>Can restaurants buy directly from farmers?</h3><p>Yes. Restaurants, hotels, dhabas and cloud kitchens can place bulk requirements and buy fresh produce directly.</p></div>
+    <div class="faq-item"><h3>Is it useful for farmers?</h3><p>Yes. Farmers can reduce dependency on middlemen and compare bulk buyers for better price opportunities.</p></div>
+    <div class="faq-item"><h3>Can I book tractor transport?</h3><p>Yes. Farmers can book tractor, pickup, harvester and equipment from the equipment booking section.</p></div>
+    <div class="faq-item"><h3>Which languages are supported?</h3><p>English, Hindi and Bhojpuri are supported for better local access.</p></div>
+  </section>
+</main>
+
+<script>
+async function init(){
+  const me = await initHeader();
+  await applyTranslations();
+  const districts = ["Patna","Gaya","Bhagalpur","Muzaffarpur","Sasaram","Varanasi","Kanpur","Delhi","Mumbai","Ranchi"];
+  districtSelect.innerHTML = districts.map(d => `<option ${me && me.district===d ? "selected" : ""}>${d}</option>`).join("");
+  loadBuyers();
+  injectFooter();
+}
+async function loadBuyers(){
+  const district = districtSelect.value || "Patna";
+  const res = await fetch("/api/restaurant-buyers?district=" + encodeURIComponent(district), {cache:"no-store"});
+  const rows = await res.json();
+  restaurantList.innerHTML = rows.map(b => `
+    <div class="buyer-card">
+      <h3>${b.name}</h3>
+      <p><b>${b.type}</b></p>
+      <p>📍 ${b.address}</p>
+      <p><b>Requirement:</b> ${b.requirement}</p>
+      <p><b>Products:</b> ${b.preferredProducts.join(", ")}</p>
+      <p class="price">${b.priceRange}</p>
+      <a class="btn full" href="/sell-product">Bulk Order / Sell Now</a>
+    </div>
+  `).join("");
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Desi Mandi</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <div class="auth-bg-slider">
+    <img id="authBgImage" src="/assets/login/login-crop.jpeg" alt="farming background">
+    <div class="auth-overlay"></div>
+  </div>
+
+  <main class="auth-layout">
+    <section class="auth-info">
+      <div class="brand-pill">🌿 Desi Mandi</div>
+      <h1>Welcome Back!</h1>
+      <p>Farmers ke liye direct buyer marketplace, live mandi price, tractor booking aur secure selling platform.</p>
+      <div class="auth-points">
+        <span>✅ Direct farmer-to-buyer platform</span>
+        <span>✅ Secure captcha protection</span>
+        <span>✅ Equipment booking with payment</span>
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <h1>Login to Your Account</h1>
+      <p class="muted center">Secure farmer dashboard access</p>
+
+      <form method="POST" action="/auth/login" id="loginForm">
+        <label>Email</label>
+        <input class="input" type="email" name="email" placeholder="Enter your email" required>
+
+        <label>Password</label>
+        <input class="input" type="password" name="password" placeholder="Enter your password" required>
+
+        <label>Security Captcha</label>
+        <div class="captcha-row">
+          <div class="captcha-box">
+            <span id="captchaText" data-captcha-text>Loading</span>
+          </div>
+          <button id="refreshCaptcha" type="button" class="captcha-refresh">↻</button>
+        </div>
+
+        <input class="input" type="text" name="captcha" placeholder="Enter captcha code" autocomplete="off" required>
+
+        <button class="btn full auth-submit" type="submit">Login</button>
+      </form>
+
+      <p class="auth-link">New farmer? <a href="/signup">Create Account</a></p>
+    </section>
+  </main>
+
+  <script src="/assets/js/captcha.js"></script>
+  <script>
+    const bgImages = [
+      "/assets/login/login-crop.jpeg",
+      "/assets/login/login-wheat.jpeg",
+      "/assets/login/login-farm-1.jpeg",
+      "/assets/login/login-farm-2.jpeg"
+    ];
+    let bgIndex = 0;
+    const bg = document.getElementById("authBgImage");
+    bgImages.forEach(src => { const i = new Image(); i.src = src; });
+    setInterval(() => {
+      bgIndex = (bgIndex + 1) % bgImages.length;
+      bg.classList.add("fade-out");
+      setTimeout(() => {
+        bg.src = bgImages[bgIndex] + "?v=hd-final";
+        bg.classList.remove("fade-out");
+      }, 420);
+    }, 2500);
+  </script>
+</body>
+</html>

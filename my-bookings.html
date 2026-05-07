@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><title>My Bookings</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<script src="/js/common.js"></script><script src="/js/i18n.js"></script><script>document.write(nav('bookings'))</script>
+<main class="main">
+  <h1 data-user></h1>
+  <section class="card">
+    <h2>Real-Time Slot Tracking + QR Verification</h2>
+    <div id="bookings"></div>
+  </section>
+</main>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+function load(){
+  fetch('/api/bookings/mine').then(r=>r.json()).then(data=>{
+    bookings.innerHTML = data.length ? data.map(b=>`
+      <div class="booking-card">
+        <div class="top">
+          <h3>${b.product} · ${b.quantity} kg</h3>
+          <span class="badge">${b.status}</span>
+        </div>
+        <p><b>Buyer:</b> ${b.buyerName || '-'}</p>
+        <p><b>Place:</b> ${b.place || '-'}</p>
+        <p><b>Preferred Slot:</b> ${b.preferredDate || '-'} · ${b.preferredTime || '-'}</p>
+        <p><b>Assigned Slot:</b> ${b.assignedDate || '-'} · ${b.assignedTime || '-'}</p>
+        <p><b>Final Price:</b> ₹${b.finalPrice || 0}</p>
+        <p><b>Payment:</b> ${b.paymentStatus || 'Pending'}</p>
+        ${stepsHtml(b.liveStep)}
+        ${b.qrCodeDataUrl ? `<div class="qr-box"><img src="${b.qrCodeDataUrl}" alt="Booking QR"><p>Show this QR at mandi gate/vendor counter</p></div>` : ''}
+        <div class="action-row">
+          <a class="btn" href="/api/bookings/${b._id}/invoice">Download Receipt PDF</a>
+          <a class="btn white" href="/verify-qr/${b._id}">Open QR Verification Page</a>
+        </div>
+      </div>
+    `).join('') : '<p>No bookings.</p>';
+  })
+}
+initHeader().then(me=>{
+  const s=io();
+  s.emit('join:user',me.id);
+  s.on('booking:update',load);
+  load();
+})
+</script><script>applyTranslations(); injectFooter();</script></body></html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buyer Distance Map</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    #map{height:520px;border-radius:24px;border:1px solid #dce8e1}
+    .map-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:16px 0}
+    .map-stat div{background:#fff;border:1px solid #dce8e1;border-radius:18px;padding:16px}
+  </style>
+</head>
+<body>
+<script src="/js/common.js"></script><script src="/js/i18n.js"></script>
+<script>document.write(nav('map'))</script>
+<main class="main">
+  <div class="top">
+    <h1 data-user>Loading...</h1>
+    <a class="btn" href="/nearby-buyers">View Buyer List</a>
+  </div>
+  <section class="card">
+    <h2>Map-Based Buyer Distance</h2>
+    <p class="muted">Aapke selected district ke nearest vendors map par show ho rahe hain.</p>
+    <div class="map-stat" id="stats"></div>
+    <div id="map"></div>
+  </section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+initHeader().then(me=>{
+  fetch('/api/vendors-map').then(r=>r.json()).then(data=>{
+    const center=data.center || {lat:25.5941,lng:85.1376};
+    const map=L.map('map').setView([center.lat,center.lng],12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
+    L.marker([center.lat,center.lng]).addTo(map).bindPopup(`<b>${data.district}</b><br>Your district center`).openPopup();
+    const rows=(data.vendors||[]).map(v=>{
+      const distance=haversine(center.lat,center.lng,v.lat,v.lng);
+      L.marker([v.lat,v.lng]).addTo(map).bindPopup(`<b>${v.name}</b><br>${v.place}<br>${v.product}: ₹${v.price}/kg<br>Distance: ${distance.toFixed(2)} km`);
+      return {...v,calcDistance:distance};
+    }).sort((a,b)=>a.calcDistance-b.calcDistance);
+    stats.innerHTML=rows.map(v=>`<div><h3>${v.name}</h3><p>${v.place}</p><b>${v.product}: ₹${v.price}/kg</b><br><span class="badge">${v.calcDistance.toFixed(2)} km away</span></div>`).join('');
+  }).catch(err=>{
+    stats.innerHTML='<p>Map data load nahi ho paaya. Server restart karke try karein.</p>';
+  });
+});
+</script>
+<script>applyTranslations(); injectFooter();</script></body>
+</html>

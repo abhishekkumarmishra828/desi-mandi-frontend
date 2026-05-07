@@ -1,0 +1,7 @@
+<!DOCTYPE html><html><head><title>Product Categories</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<script src="/js/common.js"></script><script src="/js/i18n.js"></script><script>document.write(nav('categories'))</script>
+<main class="main"><h1 class="big-title">WHAT WE <span>OFFER</span></h1><section class="card">
+<p class="muted">Farmer image-based category choose karein. Padhne ki zarurat kam, image se product select hoga.</p>
+<div class="offer-tabs"><a class="active" href="/categories">Products</a><a href="/equipment">Tractor & Equipment</a><a href="/nearby-buyers">Nearby Buyers</a></div>
+<div class="category-grid" id="grid"></div></section></main>
+<script>initHeader();fetch('/api/categories').then(r=>r.json()).then(data=>{grid.innerHTML=data.map(c=>`<a class="category-card" href="/sell-category?category=${encodeURIComponent(c.id)}"><img src="${c.image}"><h3>${c.name}</h3><p>${(c.examples||[]).slice(0,3).join(', ')}</p></a>`).join('')});</script><script>applyTranslations(); injectFooter();</script></body></html>

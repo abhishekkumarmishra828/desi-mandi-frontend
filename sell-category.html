@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><title>Sell Category Product</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<script src="/js/common.js"></script><script src="/js/i18n.js"></script><script>document.write(nav('categories'))</script>
+<main class="main"><div class="top"><h1 id="title">Sell Product</h1><a class="btn white" href="/categories">Back</a></div>
+<section class="card" style="max-width:850px"><div id="catInfo"></div>
+<form method="POST" action="/api/products" enctype="multipart/form-data">
+<input type="hidden" name="category" id="categoryInput"><input type="hidden" name="subCategory" id="subCategoryInput">
+<label>Product Type</label><select name="product" id="productSelect" required></select>
+<div class="row"><div><label>Quantity</label><input class="input" name="quantity" type="number" required placeholder="500"></div><div><label>Expected Price / kg or unit</label><input class="input" name="expectedPrice" type="number" required placeholder="25"></div></div>
+<label>Selling Place</label><input class="input" name="sellingPlace" required placeholder="Farm / Mandi location">
+<label>Product Image</label><div class="upload"><input id="imageInput" name="image" type="file" accept="image/*" required><br><br><img id="preview" style="display:none"></div>
+<label>Description</label><textarea name="description" placeholder="Quality, freshness, harvest date, variety"></textarea><br><button class="btn full">Submit Product for Vendor Review</button></form></section></main>
+<script>let categoryId=new URLSearchParams(location.search).get('category')||'vegetables';categoryInput.value=categoryId;subCategoryInput.value=categoryId;fetch('/api/categories').then(r=>r.json()).then(data=>{const c=data.find(x=>x.id===categoryId)||data[0];title.textContent='Sell '+c.name;catInfo.innerHTML=`<div class="category-card" style="max-width:260px;margin-bottom:20px"><img src="${c.image}"><h3>${c.name}</h3><p>${(c.examples||[]).join(', ')}</p></div>`;productSelect.innerHTML=(c.examples||[c.name]).map(x=>`<option>${x}</option>`).join('')});imageInput.onchange=()=>{preview.style.display='block';preview.src=URL.createObjectURL(imageInput.files[0])}</script><script>applyTranslations(); injectFooter();</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("form");
+  if(!form) return;
+  form.addEventListener("submit", (e) => {
+    const expected = Number(form.querySelector('[name="expectedPrice"]')?.value || 0);
+    const selling = Number(form.querySelector('[name="sellingPrice"]')?.value || 0);
+    if(!selling || selling <= 0){
+      e.preventDefault();
+      alert("Current Selling Price / kg enter karein. Example: 25");
+      return;
+    }
+    if(!expected || expected <= 0){
+      e.preventDefault();
+      alert("Expected Price / kg enter karein.");
+      return;
+    }
+    if(expected >= selling){
+      e.preventDefault();
+      alert("Expected Price ko Selling Price se kam rakhein. Example: selling price 25 hai to expected price 23 ya usse kam hona chahiye.");
+      return;
+    }
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector('form[action="/api/products"]');
+  if(!form) return;
+  form.addEventListener("submit", (e) => {
+    const expected = Number(form.querySelector('[name="expectedPrice"]')?.value || 0);
+    const selling = Number(form.querySelector('[name="sellingPrice"]')?.value || 0);
+    if(!selling || selling <= 0){
+      e.preventDefault();
+      alert("Current Selling Price/kg enter karein. Example: 25");
+      return;
+    }
+    if(!expected || expected <= 0){
+      e.preventDefault();
+      alert("Expected Price/kg enter karein.");
+      return;
+    }
+    const maxExpected = Math.max(1, selling - 2);
+    if(expected > maxExpected){
+      e.preventDefault();
+      alert(`Expected Price kam rakhein. Selling price ₹${selling}/kg hai, expected price ₹${maxExpected}/kg ya usse kam hona chahiye.`);
+      return;
+    }
+  });
+});
+</script>
+
+</body></html>

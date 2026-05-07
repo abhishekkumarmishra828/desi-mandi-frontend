@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<script src="/js/common.js"></script>
+<script src="/js/i18n.js"></script>
+<script>document.write(nav('dashboard'))</script>
+
+<main class="main">
+  <div class="top">
+    <h1 data-user>Hello, Farmer 👋<br><small class="muted">📍 Desi Mandi</small></h1>
+    <a class="btn white" href="/mandi-prices" data-i18n="viewPrices">View Prices</a>
+  </div>
+
+  
+  <section class="dashboard-about">
+    <div class="about-text">
+      <span class="tag">About Platform</span>
+      <h2>About <span>Desi Mandi</span></h2>
+      <p>
+        Desi Mandi ek farmer-first agriculture platform hai jahan farmers apna product directly verified buyers,
+        restaurant bulk buyers, hotels, vendors aur local market buyers ko sell kar sakte hain. Isse middleman dependency kam hoti hai
+        aur farmer ko better price opportunity milti hai.
+      </p>
+      <div class="about-points">
+        <div>🌱 Direct farmer-to-buyer selling</div>
+        <div>🏨 Restaurant bulk buyer connection</div>
+        <div>🚜 Tractor & equipment booking</div>
+        <div>📈 Live mandi price comparison</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-faq">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-grid">
+      <details open>
+        <summary>What is Desi Mandi?</summary>
+        <p>It is a farmer-first platform for selling produce, checking mandi rates, booking equipment, and connecting with verified buyers.</p>
+      </details>
+      <details>
+        <summary>Can restaurants buy directly from farmers?</summary>
+        <p>Yes. Restaurants, hotels, dhabas and cloud kitchens can place bulk requirements and buy fresh produce directly.</p>
+      </details>
+      <details>
+        <summary>Is it useful for farmers?</summary>
+        <p>Yes. Farmers can reduce dependency on middlemen and compare bulk buyers for better price opportunities.</p>
+      </details>
+      <details>
+        <summary>Can I book tractor transport?</summary>
+        <p>Yes. Farmers can book tractor, pickup, harvester and equipment from the equipment booking section.</p>
+      </details>
+      <details>
+        <summary>Which languages are supported?</summary>
+        <p>English, Hindi and Bhojpuri are supported for better local access.</p>
+      </details>
+    </div>
+  </section>
+
+
+  <section class="visual-actions">
+    <a class="visual-card product" href="/categories">
+      <img src="/assets/dashboard-category-real.webp?v=uploaded-final" alt="Image based categories">
+      <div>
+        <h2 data-i18n="imageBasedCategories">Image-Based Categories</h2>
+        <p data-i18n="imageBasedText">Choose by image and sell vegetables, fruits, fish, wheat, sugarcane and more.</p>
+        <span data-i18n="openCategories">Open Categories</span>
+      </div>
+    </a>
+
+    <a class="visual-card tractor" href="/equipment">
+      <img src="/assets/dashboard-tractor.jpg?v=front-final" alt="Book tractor transport">
+      <div>
+        <h2 data-i18n="tractorTransport">Tractor Transport</h2>
+        <p data-i18n="tractorText">Book tractor, pickup and farming equipment to carry produce to mandi or buyer.</p>
+        <span data-i18n="bookEquipment">Book Equipment</span>
+      </div>
+    </a>
+
+    <a class="visual-card product" href="/sell-product">
+      <img src="/assets/dashboard-sell-products-real.jpeg?v=uploaded-final" alt="Sell your product">
+      <div>
+        <h2 data-i18n="sellYourProduct">Sell Your Product</h2>
+        <p data-i18n="sellText">Upload product image and post it for vendor review with AI freshness score.</p>
+        <span data-i18n="postNow">Post Now</span>
+      </div>
+    </a>
+
+    <a class="visual-card slot" href="/book-slot">
+      <img src="/assets/dashboard-slot.svg?v=front-final" alt="Book selling slot">
+      <div>
+        <h2 data-i18n="bookASlot">Book a Slot</h2>
+        <p data-i18n="slotText">Fix date and time with buyer and sell directly without long waiting.</p>
+        <span data-i18n="bookNow">Book Now</span>
+      </div>
+    </a>
+  
+    <a class="visual-card restaurant" href="/restaurant-buyers">
+      <img src="/assets/dashboard-sell-products-real.jpeg?v=restaurant" alt="Restaurant bulk buyers">
+      <div>
+        <h2>Restaurant Bulk Buyers</h2>
+        <p>Hotels, restaurants aur vendors ko fresh products bulk quantity me direct sell karein.</p>
+        <span>View Buyers →</span>
+      </div>
+    </a>
+
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="bestPriceToday">Best Price Today</h2>
+    <div class="grid" id="prices">
+      <div class="price-card"><h3>Potato</h3><h2>₹20/kg</h2><p>Today</p></div>
+      <div class="price-card"><h3>Tomato</h3><h2>₹18/kg</h2><p>Today</p></div>
+      <div class="price-card"><h3>Onion</h3><h2>₹24/kg</h2><p>Today</p></div>
+    </div>
+  </section>
+</main>
+
+<script>
+
+function dmHashCode(str){let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return Math.abs(h);}
+function dmDateKey(offset=0){const d=new Date();d.setDate(d.getDate()+offset);return d.toISOString().slice(0,10);}
+function dmLocalRows(district){
+  const ps=[["Potato",20],["Tomato",18],["Onion",24],["Cauliflower",28],["Cabbage",16],["Mango",60]];
+  return ps.map(([product,basePrice])=>{
+    const calc=(off)=>{const h=dmHashCode(`${district}-${product}-${dmDateKey(off)}`);const percent=((h%17)-8)/100;const df=((dmHashCode(district)%7)-3)/100;return Math.max(5,Math.round(basePrice*(1+percent+df)*10)/10);};
+    const modalPrice=calc(0), yesterdayPrice=calc(-1);
+    const change=Math.round((modalPrice-yesterdayPrice)*10)/10;
+    const changePercent=yesterdayPrice?Math.round((change/yesterdayPrice)*1000)/10:0;
+    return {product,modalPrice,yesterdayPrice,change,changePercent};
+  });
+}
+function dmRenderDashboardPrices(rows){
+  const box=document.getElementById('prices');
+  if(!box) return;
+  box.innerHTML = rows.slice(0,6).map(p => {
+    const cls = Number(p.change) > 0 ? 'up' : (Number(p.change) < 0 ? 'down' : 'same');
+    const icon = Number(p.change) > 0 ? '▲' : (Number(p.change) < 0 ? '▼' : '━');
+    return `
+      <div class="price-card">
+        <h3>${p.product}</h3>
+        <h2>₹${p.modalPrice}/kg</h2>
+        <p>Yesterday: ₹${p.yesterdayPrice}/kg</p>
+        <p class="${cls}">${icon} ${p.change >= 0 ? '+' : ''}${p.change} (${p.changePercent >= 0 ? '+' : ''}${p.changePercent}%)</p>
+      </div>
+    `;
+  }).join('');
+}
+
+(async function(){
+  const me = await initHeader();
+  await applyTranslations();
+
+  let district = (me && me.district) ? me.district : "Patna";
+  try{
+    const res = await fetch('/api/mandi-prices?district=' + encodeURIComponent(district), { cache:'no-store' });
+    if(res.ok){
+      const rows = await res.json();
+      if(Array.isArray(rows) && rows.length){
+        dmRenderDashboardPrices(rows);
+      } else {
+        dmRenderDashboardPrices(dmLocalRows(district));
+      }
+    } else {
+      dmRenderDashboardPrices(dmLocalRows(district));
+    }
+  }catch(e){
+    dmRenderDashboardPrices(dmLocalRows(district));
+  }
+
+  await injectFooter();
+})();
+</script>
+</body>
+</html>

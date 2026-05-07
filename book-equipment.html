@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><title>Book Equipment</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<script src="/js/common.js"></script><script src="/js/i18n.js"></script><script>document.write(nav('equipment'))</script>
+<main class="main"><div class="top"><h1>Book Tractor / Equipment</h1><a class="btn white" href="/equipment">Back</a></div>
+<section class="card" style="max-width:850px"><div id="selected"></div>
+<form method="POST" action="/api/equipment-bookings"><input type="hidden" name="equipmentId" id="equipmentId">
+<div class="row"><div><label>Booking Date</label><input class="input" type="date" name="bookingDate" required></div><div><label>Time Slot</label><select name="timeSlot"><option>06:00 AM - 09:00 AM</option><option>09:00 AM - 12:00 PM</option><option>12:00 PM - 03:00 PM</option><option>03:00 PM - 06:00 PM</option></select></div></div>
+<label>Pickup / Farm Location</label><input class="input" name="pickupLocation" required placeholder="Village, block, landmark">
+<label>Purpose</label><textarea name="purpose" placeholder="Example: Tomato ko mandi tak transport karna hai"></textarea><br>
+<button class="btn full">Submit Equipment Booking</button></form></section></main>
+<script>
+let id=new URLSearchParams(location.search).get('id');
+equipmentId.value=id;
+const fixedImages={tractor45:"/assets/tractor-real.jpg",rotavator6:"/assets/thresher-real.webp",sprayer16:"/assets/sprayer-real.jpeg",miniTruck:"/assets/pickup-real.jpeg",thresher:"/assets/thresher-real.webp",harvester:"/assets/harvester-real.jpg"};
+fetch('/api/equipment?ts='+Date.now()).then(r=>r.json()).then(data=>{
+ const e=data.find(x=>x.id===id)||data[0];
+ const img=fixedImages[e.id]||e.image;
+ selected.innerHTML=`<div class="equipment-card" style="max-width:360px;margin-bottom:20px"><img src="${img}?v=final-real-2"><h3>${e.name}</h3><p class="price">₹${e.rentPrice} / ${e.rentType}</p></div>`;
+});
+</script><script>applyTranslations(); injectFooter();</script></body></html>

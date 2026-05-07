@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Equipment Payment</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+<body>
+<script src="/js/common.js"></script>
+<script src="/js/i18n.js"></script>
+<script>document.write(nav('equipment'))</script>
+
+<main class="main">
+  <div class="top">
+    <h1>Equipment Payment</h1>
+    <a class="btn white" href="/my-equipment-bookings">My Equipment Bookings</a>
+  </div>
+
+  <section class="card payment-card">
+    <div id="bookingBox">Loading booking...</div>
+    <div class="payment-actions">
+      <button class="btn" id="cashfreeBtn">Pay with Cashfree</button>
+      <button class="btn white" id="demoPaidBtn">Demo Paid</button>
+      <a class="btn white" href="/my-equipment-bookings">Pay Later</a>
+    </div>
+    <p class="muted">
+      Cashfree Sandbox se payment karne ke liye Pay with Cashfree click karein.
+      Demo Paid testing ke liye hai aur MongoDB me paymentStatus = Paid kar dega.
+    </p>
+    <pre id="debugBox" class="muted" style="white-space:pre-wrap"></pre>
+  </section>
+</main>
+
+<script>
+const bookingId = location.pathname.split("/").pop();
+
+async function loadBooking(){
+  try{
+    const res = await fetch('/api/equipment-bookings/' + bookingId, { cache:'no-store' });
+    const booking = await res.json();
+    if(booking.error) throw new Error(booking.error);
+
+    bookingBox.innerHTML = `
+      <div class="booking-card">
+        <h2>${booking.equipmentName}</h2>
+        <p><b>Rent:</b> ₹${booking.paymentAmount || booking.rentPrice} / ${booking.rentType}</p>
+        <p><b>Date:</b> ${booking.bookingDate} · ${booking.timeSlot}</p>
+        <p><b>Location:</b> ${booking.pickupLocation}</p>
+        <p><b>Purpose:</b> ${booking.purpose || '-'}</p>
+        <p><b>Booking Status:</b> <span class="badge">${booking.status}</span></p>
+        <p><b>Payment Status:</b> <span class="badge">${booking.paymentStatus || 'Pending'}</span></p>
+      </div>
+    `;
+  }catch(e){
+    bookingBox.innerHTML = `<p>Booking load error: ${e.message}</p>`;
+  }
+}
+loadBooking();
+
+cashfreeBtn.onclick = async () => {
+  cashfreeBtn.disabled = true;
+  cashfreeBtn.textContent = "Creating Order...";
+  debugBox.textContent = "";
+  try{
+    const res = await fetch('/api/equipment-payments/create-order/' + bookingId, { method:'POST' });
+    const data = await res.json();
+
+    if(data.error){
+      debugBox.textContent = JSON.stringify(data, null, 2);
+      alert("Cashfree order failed. Details niche debug box me hain.");
+      cashfreeBtn.disabled = false;
+      cashfreeBtn.textContent = "Pay with Cashfree";
+      return;
+    }
+
+    if(!data.payment_session_id){
+      debugBox.textContent = JSON.stringify(data, null, 2);
+      alert("Cashfree payment_session_id nahi mila.");
+      cashfreeBtn.disabled = false;
+      cashfreeBtn.textContent = "Pay with Cashfree";
+      return;
+    }
+
+    const cashfree = Cashfree({ mode: "sandbox" });
+    await cashfree.checkout({
+      paymentSessionId: data.payment_session_id,
+      redirectTarget: "_self"
+    });
+  }catch(err){
+    debugBox.textContent = err.stack || err.message;
+    alert("Cashfree payment error: " + err.message);
+    cashfreeBtn.disabled = false;
+    cashfreeBtn.textContent = "Pay with Cashfree";
+  }
+};
+
+demoPaidBtn.onclick = async () => {
+  demoPaidBtn.disabled = true;
+  demoPaidBtn.textContent = "Processing...";
+  try{
+    const res = await fetch('/api/equipment-payments/demo-paid/' + bookingId, { method:'POST' });
+    const data = await res.json();
+    if(data.success){
+      alert("Demo payment successful. Payment status Paid ho gaya.");
+      location.href = "/my-equipment-bookings";
+    }else{
+      throw new Error(data.error || "Demo payment failed");
+    }
+  }catch(err){
+    alert("Demo payment error: " + err.message);
+    demoPaidBtn.disabled = false;
+    demoPaidBtn.textContent = "Demo Paid";
+  }
+};
+
+if(typeof applyTranslations === "function") applyTranslations();
+if(typeof injectFooter === "function") injectFooter();
+</script>
+</body>
+</html>

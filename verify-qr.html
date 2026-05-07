@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><title>QR Verification</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<div class="main" style="margin-left:0;max-width:900px;margin:auto">
+  <section class="card">
+    <h1>Booking QR Verification</h1>
+    <div id="details">Loading...</div>
+  </section>
+</div>
+<script>
+const id = location.pathname.split('/').pop();
+fetch('/api/bookings/' + id).then(r=>r.json()).then(b=>{
+  details.innerHTML = `
+    <h2>${b.product} · ${b.quantity} kg</h2>
+    <p><b>Farmer:</b> ${b.farmerName}</p>
+    <p><b>Buyer:</b> ${b.buyerName}</p>
+    <p><b>Place:</b> ${b.place}</p>
+    <p><b>Slot:</b> ${b.assignedDate || b.preferredDate} · ${b.assignedTime || b.preferredTime}</p>
+    <p><b>Status:</b> ${b.status}</p>
+    <p><b>QR Verified:</b> ${b.qrVerified ? 'Yes' : 'No'}</p>
+    <form method="POST" action="/api/bookings/${b._id}/qr-verify">
+      <button class="btn full">Verify This QR / Mark Reached Mandi</button>
+    </form>
+  `;
+}).catch(()=>details.innerHTML='<p>QR verification failed. Login as admin/vendor may be required.</p>');
+</script></body></html>

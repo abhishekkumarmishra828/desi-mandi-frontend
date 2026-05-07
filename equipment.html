@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tractor and Equipment</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<script src="/js/common.js"></script><script src="/js/i18n.js"></script>
+<script>document.write(nav('equipment'))</script>
+
+<main class="main">
+  <h1 class="big-title">TRACTOR & <span>EQUIPMENT</span> BOOKING</h1>
+  <section class="card">
+    <p class="muted">
+      Farmer apna product mandi/seller tak le jaane ke liye tractor, pickup, sprayer, rotavator, thresher, harvester book kar sakta hai.
+      Yahan tumhare uploaded real images use kiye gaye hain.
+    </p>
+    <div class="grid" id="equipmentGrid"></div>
+  </section>
+</main>
+
+<script>
+initHeader();
+
+const fixedImages = {
+  tractor45: "/assets/tractor-real.jpg",
+  rotavator6: "/assets/thresher-real.webp",
+  sprayer16: "/assets/sprayer-real.jpeg",
+  miniTruck: "/assets/pickup-real.jpeg",
+  thresher: "/assets/thresher-real.webp",
+  harvester: "/assets/harvester-real.jpg"
+};
+
+function renderEquipment(data){
+  equipmentGrid.innerHTML = data.map(e => {
+    const img = fixedImages[e.id] || e.image;
+    return `
+      <div class="equipment-card">
+        <img src="${img}?v=final-real-2" alt="${e.name}">
+        <h3>${e.name}</h3>
+        <p>${e.type}</p>
+        <p class="price">Rent: ₹${e.rentPrice} / ${e.rentType}</p>
+        <a class="btn full" href="/book-equipment?id=${e.id}">Book Now</a>
+      </div>
+    `;
+  }).join('');
+}
+
+fetch('/api/equipment?ts=' + Date.now())
+  .then(r => r.json())
+  .then(renderEquipment)
+  .catch(() => {
+    renderEquipment([
+      {id:"tractor45", name:"Tractor 45 HP", type:"Tractor", rentPrice:850, rentType:"per hour"},
+      {id:"rotavator6", name:"Rotavator 6 ft", type:"Equipment", rentPrice:1200, rentType:"per day"},
+      {id:"sprayer16", name:"Sprayer 16L Battery", type:"Equipment", rentPrice:350, rentType:"per day"},
+      {id:"miniTruck", name:"Mini Truck / Pickup", type:"Transport", rentPrice:1500, rentType:"per trip"},
+      {id:"thresher", name:"Thresher", type:"Equipment", rentPrice:2500, rentType:"per day"},
+      {id:"harvester", name:"Harvester", type:"Equipment", rentPrice:3000, rentType:"per acre"}
+    ]);
+  });
+</script>
+<script>applyTranslations(); injectFooter();</script></body>
+</html>
